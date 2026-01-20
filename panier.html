@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سلة المشتريات - Old Rock Products</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+<style>
+body {margin:0;font-family:"Tahoma",sans-serif;background:#f9fbff;color:#222;}
+header {background:#fff;border-bottom:1px solid #eee;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;}
+header .logo img {height:60px;}
+header a {text-decoration:none;color:#007bff;font-weight:700;}
+.container {max-width:900px;margin:30px auto;padding:16px;}
+.section-title {font-family:'Montserrat',sans-serif;font-size:30px;font-weight:800;text-align:center;margin:20px 0;color:#000;}
+.cart-list {background:#fff;border:1px solid #eee;border-radius:12px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,0.05);}
+.cart-item {display:flex;gap:12px;align-items:center;border-bottom:1px solid #f0f0f0;padding:12px 0;}
+.cart-item:last-child {border-bottom:none;}
+.cart-item img {width:70px;height:70px;border-radius:8px;object-fit:cover;}
+.item-info {flex:1;}
+.item-name {font-weight:700;margin-bottom:6px;}
+.item-controls {display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.qty-input {width:90px;padding:6px;border:1px solid #ccc;border-radius:6px;}
+.yard-select, .yard-custom {padding:6px;border:1px solid #ccc;border-radius:6px;}
+.remove-btn {background:#ffe9e9;color:#d63031;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;}
+.form-card {margin-top:24px;background:#F8FCFF;padding:20px;border-radius:10px;border:2px solid #007bff;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.form-card h2 {text-align:center;color:#007bff;margin-bottom:20px;padding:10px 15px;border:1px solid #ccc;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+label {font-weight:700;}
+input, select, textarea {width:100%;padding:8px;margin:8px 0;border:1px solid #ccc;border-radius:6px;}
+.submit-wrap {text-align:center;margin-top:16px;}
+.submit-btn {background:#007bff;color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;}
+.note {font-size:13px;color:#555;margin-top:8px;text-align:center;}
+.empty {text-align:center;color:#777;background:#fff;border:1px solid #eee;border-radius:12px;padding:24px;}
+.badge-min {display:inline-block;background:#eaf3ff;color:#0066cc;border:1px solid #0066cc;border-radius:8px;padding:6px 10px;font-weight:700;margin:10px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">← العودة إلى الصفحة الرئيسية</a>
+  <div class="logo">
+    <img src="https://i.ibb.co/23bP1jHV/Photo-Room-20250823-060952.png" alt="Old Rock Products">
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="section-title">سلة المشتريات</h1>
+
+  <div id="cart-area"></div>
+
+  <div id="form-area" class="form-card" style="display:none;">
+    <h2>Formulaire de commande</h2>
+    <p style="text-align:center;font-weight:bold; direction: rtl;">
+      يرجى تأكيد المنتجات والكمية المطلوبة (الحد الأدنى 30 كرتون).
+    </p>
+
+    <!-- Dynamic items summary for submission -->
+    <form id="order-form" action="https://formsubmit.co/old.rock.products34@gmail.com" method="POST">
+      <div id="summary-fields"></div>
+
+      <h3 style="text-align:center;color:#007bff;margin-top:20px;margin-bottom:15px;padding:8px 12px;border:1px solid #ccc;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+        Informations client
+      </h3>
+
+      <label>Nom complet :</label>
+      <input type="text" name="Nom" required>
+
+      <label>Email :</label>
+      <input type="email" name="Email" required>
+
+      <label>Téléphone :</label>
+      <div style="display:flex;gap:8px;">
+        <select name="Indicatif" required style="width:140px;">
+          <option value="+213">+213 DZ</option><option value="+33">+33 FR</option><option value="+212">+212 MA</option>
+          <option value="+216">+216 TN</option><option value="+20">+20 EG</option><option value="+221">+221 SN</option>
+          <option value="+971">+971 UAE</option><option value="+44">+44 UK</option><option value="+1">+1 US/CA</option>
+        </select>
+        <input type="tel" name="Téléphone" placeholder="Numéro de téléphone" required style="flex:1;">
+      </div>
+
+      <label>Adresse de livraison :</label>
+      <textarea name="Adresse" rows="3" required></textarea>
+
+      <label>Autres commentaires :</label>
+      <textarea name="Commentaires" rows="3" placeholder="Facultatif"></textarea>
+
+      <input type="hidden" name="_captcha" value="false">
+
+      <div class="submit-wrap">
+        <input type="submit" class="submit-btn" value="Envoyer la commande">
+      </div>
+
+      <p class="note">الحد الأدنى لإرسال الطلب: 30 كرتون</p>
+    </form>
+  </div>
+</div>
+
+<script>
+const CART_KEY = 'oldrock_cart_v1';
+function getCart(){ try{return JSON.parse(localStorage.getItem(CART_KEY))||[]}catch(e){return[];} }
+function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); render(); }
+
+function render(){
+  const area = document.getElementById('cart-area');
+  const formArea = document.getElementById('form-area');
+  const cart = getCart();
+
+  if(cart.length===0){
+    area.innerHTML = `<div class="empty">السلة فارغة. قم بإضافة المنتجات من الصفحة الرئيسية.</div>`;
+    formArea.style.display='none';
+    return;
+  }
+
+  // Cart list with controls
+  area.innerHTML = `
+    <div class="cart-list">
+      ${cart.map(item=>{
+        const yardSelect = item.yardSelectable ? `
+          <select class="yard-select" onchange="onYardChange('${item.id}', this.value)">
+            <option value="" ${!item.yardValue?'selected':''}>اختر الـ Yard…</option>
+            ${item.yardOptions.map(opt=>{
+              const label = opt==='personnalise' ? 'مخصص' : opt;
+              const sel = item.yardValue===opt ? 'selected' : '';
+              return `<option value="${opt}" ${sel}>${label}</option>`;
+            }).join('')}
+          </select>
+        ` : '';
+        const yardCustom = item.yardSelectable && item.yardValue==='personnalise' ? `
+          <input class="yard-custom" type="text" placeholder="أدخل القيمة" value="${item.yardValueCustom||''}" oninput="onYardCustom('${item.id}', this.value)">
+        ` : '';
+        return `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}">
+            <div class="item-info">
+              <div class="item-name">${item.name}</div>
+              <div class="item-controls">
+                <label>الكمية:</label>
+                <input class="qty-input" type="number" min="1" value="${item.qty}" onchange="onQtyChange('${item.id}', this.value)">
+                ${yardSelect}
+                ${yardCustom}
+                <button class="remove-btn" onclick="removeItem('${item.id}')">إزالة</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <div class="badge-min">يمكن إتمام الطلب عند الوصول إلى 30 كرتون على الأقل</div>
+  `;
+
+  // Show form and build hidden fields summary
+  formArea.style.display = 'block';
+  buildSummaryFields(cart);
+}
+
+function buildSummaryFields(cart){
+  const wrap = document.getElementById('summary-fields');
+  // Validate yard selection before submission (we'll also validate on submit)
+  wrap.innerHTML = '';
+  cart.forEach((item, idx)=>{
+    wrap.innerHTML += `
+      <input type="hidden" name="Produit ${idx+1} - Nom" value="${item.name}">
+      <input type="hidden" name="Produit ${idx+1} - Quantité" value="${item.qty}">
+      ${item.yardSelectable ? `
+        <input type="hidden" name="Produit ${idx+1} - Yard sélection" value="${item.yardValue||''}">
+        <input type="hidden" name="Produit ${idx+1} - Yard personnalisé" value="${item.yardValue==='personnalise' ? (item.yardValueCustom||'') : ''}">
+      ` : ``}
+    `;
+  });
+
+  // Attach submit validation
+  const form = document.getElementById('order-form');
+  form.onsubmit = function(e){
+    const total = cart.reduce((sum,i)=>sum+(Number(i.qty)||0),0);
+    if(total < 30){
+      e.preventDefault();
+      alert("La commande doit contenir au moins 30 articles au total !");
+      return;
+    }
+    // Check yards filled if required
+    for(const item of cart){
+      if(item.yardSelectable){
+        if(!item.yardValue){
+          e.preventDefault();
+          alert("يرجى اختيار الـ Yard للمنتج: " + item.name);
+          return;
+        }
+        if(item.yardValue==='personnalise' && !(item.yardValueCustom && item.yardValueCustom.trim())){
+          e.preventDefault();
+          alert("يرجى إدخال قيمة Yard المخصصة للمنتج: " + item.name);
+          return;
+        }
+      }
+    }
+  };
+}
+
+// Cart operations
+function onQtyChange(id, value){
+  const cart = getCart();
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  const v = Math.max(1, Number(value)||1);
+  item.qty = v;
+  saveCart(cart);
+}
+function onYardChange(id, value){
+  const cart = getCart();
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.yardValue = value || null;
+  if(value !== 'personnalise') item.yardValueCustom = '';
+  saveCart(cart);
+}
+function onYardCustom(id, value){
+  const cart = getCart();
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.yardValueCustom = value;
+  saveCart(cart);
+}
+function removeItem(id){
+  let cart = getCart();
+  cart = cart.filter(i=>i.id!==id);
+  saveCart(cart);
+}
+
+// Init
+render();
+</script>
+
+</body>
+</html>
